@@ -4,6 +4,7 @@ Gestion des adresses de cryptos pour un utilisateur. Va aussi pouvoir gérer une
 ## Documents inclues (Doc Tree)
 1. SRS.md = "Software Requirements Specification"
    The SRS serves as the reference for understanding the system requirements and as the foundation     for design and development decisions.
+   
 2. ADR.md = "Architecture Decision Records"
     ADR entries ensure traceability, consistency, and clarity throughout the evolution of the          system architecture.
 
