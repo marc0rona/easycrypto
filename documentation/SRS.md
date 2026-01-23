@@ -1,1 +1,82 @@
+# Cahier des charges (SRS léger) — EZ-CRYPT0
+**Équipe :** Marco-Andrés Mora, Driss Laaziri
+**Date :** 2026-01-22
+**Version :** v0.1
 
+---
+
+## 1. Contexte & Objectif
+- **Contexte :** Quand une personne commence a devenir un investisseur dans la crypto, ce n'est pas comme la bourse normal, qui s`ouvre a une certaine heure (9am) et ensuite ferme (4pm) jusqu'à la prochaine journée. C'est des monnaies qui roule et bouge 24 heures chaque journées. De plus, les gens ne vont pas posséder juste 1 ou 2 monnaies à la fois, non, ils vont vouloir maximiser leur chance de faire de l'argent en investissant dans plusieurs crypto différente. Donc, un investisseur va posséder plusieurs adresses réparties sur différentes platformes et supports de manière très dispersé.
+
+La personne average ne va pas avoir le temps de gérer tout ce brouhaha, alors tout cela entraîne une perte de temps et même des risques d’erreurs et une mauvaise organisation. Nous voulons pouvoir les aider en gérant ces adresses publiques de manière très simple et sécurisée.
+
+- **Objectif principal :** L'objectif de ce projet est de fournir une plateforme simple permettant aux gens de bien organiser leur crypto et retrouver facilement leurs adresses qui sont publiques sans avoir a faire a différentes clés privées ou blockchains.
+- **Parties prenantes :**
+  + *Utilisateurs* : Investisseurs en crypto (amateurs et experts), personne régulière qui aime investir pour le fun et aussi les addictes aux cryptomonnaies
+  + *Administrateurs & développeurs* : responsables de la gestion des comptes et vérification l'état du site
+
+---
+
+## 2. Portée (Scope)
+### 2.1 Inclus (IN)
+- IN-1 : <fonction / cas d’usage inclus>
+- IN-2 : <...>
+
+### 2.2 Exclu (OUT)
+- OUT-1 : <fonction explicitement hors scope>
+- OUT-2 : <...>
+
+---
+
+## 3. Acteurs / profils utilisateurs
+- **Acteur A :** <rôle, besoins, contraintes>
+- **Acteur B :** <...>
+
+---
+
+## 4. Exigences fonctionnelles (FR)
+> Forme recommandée : “Le système doit…”
+- **FR-1 :** Le système doit <...>
+- **FR-2 :** Le système doit <...>
+
+---
+
+## 5. Exigences non fonctionnelles (NFR)
+> Performance / sécurité / disponibilité / UX / maintenabilité…
+- **NFR-1 (Performance) :** <ex. temps de réponse < 2s>
+- **NFR-2 (Sécurité) :** <ex. authentification requise>
+- **NFR-3 (UX) :** <ex. parcours en ≤ 3 clics>
+- **NFR-4 (Qualité) :** <ex. couverture minimale de tests>
+
+---
+
+## 6. Contraintes
+- **C-1 (Technologie) :** <langage / framework imposé>
+- **C-2 (Plateforme) :** <web / mobile / desktop>
+- **C-3 (Délai) :** <dates de phases>
+- **C-4 (Outils) :** <Git, CI, etc.>
+
+---
+
+## 7. Données & règles métier (si applicable)
+- **Entités principales :** <User, Order, ...>
+- **Règles métier :** <validation, calculs, permissions, etc.>
+
+---
+
+## 8. Hypothèses & dépendances
+### 8.1 Hypothèses
+- H-1 : <ex. utilisateurs ont un compte>
+- H-2 : <...>
+
+### 8.2 Dépendances
+- D-1 : <API externe / BD / service>
+- D-2 : <...>
+
+---
+
+## 9. Critères d’acceptation globaux (Definition of Done – mini)
+- [ ] Fonctionnalités livrées et testées
+- [ ] Tests unitaires présents
+- [ ] Gestion d’erreurs minimale
+- [ ] Documentation à jour (UML + ADR si requis)
