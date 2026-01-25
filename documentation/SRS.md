@@ -40,32 +40,37 @@
 - OUT-4 : Voir l'historique et soldes d'un portefeuille d'un utilisateur
 - OUT-5 : Version Mobile (Android/iOS)
 - OUT-6 : Support de navigation autres que Google Chrome
-- OUT-7 : Custodial Wallet, c'est-à-dire, un middle-man qui gère la crypto pour toi 
+- OUT-7 : Custodial Wallet, c'est-à-dire, un middle-man qui gère la crypto pour toi
+- OUT-8 : Gérer des cryptos qui n'exsitent pas. Doivent exister pour de vrai, rien de fictif. 
 
 ---
 
 ## 3. Acteurs / profils utilisateurs
-# Acteur A 
-- **Rôle :**   
-- **Besoins :**
-- **Contraintes :**
+### Acteur A : Clients
+- **Rôle :** Utilisateurs standards qui veulent organiser leurs cryptos
+- **Besoins :** Création et désactivation des comptes utilisateurs avec une bonne sécurité assurée. Peux modifier son compte en changeant ses informations. Consultation des informations sur leurs crypto via la platforme web. Ajout ou suppression d'une adresse crypto de leur liste. 
+- **Contraintes :** Ne peux pas se connecter comme Admin ou manipuler le site comme admin. Ne peux pas changer le design du site. Ne peux pas accéder aux données d'un autre utilisateur. N'accède aucune clé privée ou fonctionnalité de blockchain directe à un crypto. Ne peux pas utiliser l'extension Chrome en dehors de Google Chrome.
   
-# Acteur B
-- **Rôle :**   
-- **Besoins :**
-- **Contraintes :**
+### Acteur B : Administrateurs 
+- **Rôle :** Gestion des comptes et du site en général 
+- **Besoins :** Vérifier les comptes utilisateurs ; à le pouvoir de les activer, désactiver ou supprimer. Gestion du code interne du site et vérifie que tout fonctionne bien. Assure une bonne sécurité dans le site pour lutter contre des attaques en ligne, toujours en s'adaptant et en assurant des bonnes mise-à-jour. 
+- **Contraintes :** Ne peux pas changer les adresses cryptos d'un utilisateur. Ne peux pas désactiver une crypto ou accéder a un blockchain directe. Ne peux pas supprimer le site ou changer du code qui sont importants pour sa fonctionalité.
 
-# Acteur C
-- **Rôle :**   
-- **Besoins :**
-- **Contraintes :**
-- 
+### Acteur C : Extension Google Chrome
+- **Rôle :** acteur technique qui permet la détection et enregistrement de crypto depuis une Page Web
+- **Besoins :** Notification à un utilisateur pour suggérer et transmettre des cryptos à enregistrer dans le compte. Se connecte avec l'API du serveur et authentifie l'utilisateur sans problème de sécurité ou connection.
+- **Contraintes :** Ne stocke pas de données sensibles localement. Fonctionne seulement si le serveur est disponible. Ne peux pas changer ou supprimer automatiquement des informations ou crypto d'un utilisateur, toujours demander la persmission en premier. Ne peux pas lister des cryptos qui n'existe pas (fictif). Fonctionne seulment so Google Chrome.
+  
 ---
 
 ## 4. Exigences fonctionnelles (FR)
 > Forme recommandée : “Le système doit…”
-- **FR-1 :** Le système doit <...>
-- **FR-2 :** Le système doit <...>
+- **FR-1 :** Le système doit permettre à une personne de créer un compte avec un Username et un mot de passe.
+- **FR-2 :** Le système doit permettre à un Utilisateur de se connecter au site avec un compte déjà créer qui ne sois pas banis du site.
+- **FR-3 :** Le système doit authentifier le compte qui se connecte pour voir s'il existe dans la Base de Données.
+- **FR-4 :** Le système doit permettre à un Utilisateur d'accéder à son dashboard quand la connection est établie.
+- **FR-5 :** Le système doit permettre à un Utilisateur de se déconnecter de la plateforme.
+- **FR-6 :** Le système doit restreindre l’accès aux fonctionnalités selon le rôle (User or Admin)
 
 ---
 
