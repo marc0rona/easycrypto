@@ -8,7 +8,7 @@ L'objectif principal est de simplifier la vie des utilisateurs en leurs sauvant 
 
 ## Équipe
 - Marco-Andrés Mora - 2332530
-- Driss Laaziri - Num Étudiant
+- Driss Laaziri - 2411533
 
 ---
 
