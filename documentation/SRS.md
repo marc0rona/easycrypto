@@ -64,47 +64,137 @@
 ---
 
 ## 4. Exigences fonctionnelles (FR)
-> Forme recommandée : “Le système doit…”
-- **FR-1 :** Le système doit permettre à une personne de créer un compte avec un Username et un mot de passe.
-- **FR-2 :** Le système doit permettre à un Utilisateur de se connecter au site avec un compte déjà créer qui ne sois pas banis du site.
-- **FR-3 :** Le système doit authentifier le compte qui se connecte pour voir s'il existe dans la Base de Données.
-- **FR-4 :** Le système doit permettre à un Utilisateur d'accéder à son dashboard quand la connection est établie.
-- **FR-5 :** Le système doit permettre à un Utilisateur de se déconnecter de la plateforme.
-- **FR-6 :** Le système doit restreindre l’accès aux fonctionnalités selon le rôle (User or Admin)
+### Authentification & gestion des comptes
+- **FR-1** : Création de compte avec nom d’utilisateur et mot de passe et email
+- **FR-2** : Connexion avec un compte existant et actif  
+- **FR-3** : Vérification de l’existence du compte dans la base de données  
+- **FR-4** : Refus d’accès pour les comptes désactivés ou bannis  
+- **FR-5** : Accès au tableau de bord personnel après authentification  
+- **FR-6** : Déconnexion de la plateforme  
+- **FR-7** : Gestion des rôles (Utilisateur / Administrateur)  
+- **FR-8** : Restriction des fonctionnalités selon le rôle
 
+###  Gestion du profil utilisateur
+
+- **FR-9** : Modification des informations du compte (ex. mot de passe)  
+- **FR-10** : Désactivation du compte par l’utilisateur
+
+###  Gestion des adresses crypto (Utilisateur)
+
+- **FR-11** : Ajout d’une adresse de cryptomonnaie  
+- **FR-12** : Association de l’adresse crypto à l’utilisateur connecté  
+- **FR-13** : Modification d’une adresse crypto existante  
+- **FR-14** : Suppression d’une adresse crypto  
+- **FR-15** : Affichage des adresses crypto dans le tableau de bord  
+- **FR-16** : Organisation des adresses (nom, type, etc.)  
+- **FR-17** : Protection contre l’accès aux adresses d’autres utilisateurs
+
+###  Validation & règles métier
+
+- **FR-18** : Validation du format des adresses crypto  
+- **FR-19** : Validation des données côté serveur via l’API  
+- **FR-20** : Refus des adresses crypto invalides ou inexistantes  
+- **FR-21** : Blocage des adresses crypto fictives ou non reconnues
+
+###  Extension Google Chrome
+
+- **FR-22** : Détection d’adresses crypto sur les pages web  
+- **FR-23** : Analyse du contenu pour identifier des adresses valides  
+- **FR-24** : Confirmation utilisateur avant enregistrement 
+- **FR-26** : Association automatique des adresses au compte utilisateur  
+- **FR-27** : limité à Google Chrome
+
+###  Synchronisation site ↔ extension
+
+- **FR-28** : Les adresses ajoutées via l’extension apparaissent sur le site  
+- **FR-29** : Chaque utilisateur ne voit que ses propres adresses  
+- **FR-30** : Le site montre si les adresses sont bien synchronisées
+
+###  Tableau de bord Administrateur
+
+- **FR-31** : Accès à un tableau de bord administrateur  
+- **FR-32** : Consultation des utilisateurs  
+- **FR-33** : Activation, désactivation ou suppression de comptes  
+- **FR-34** : Interdiction de modifier les adresses crypto des utilisateurs  
+- **FR-35** : Suivi de l’état global du système
+
+###  Site public & téléchargement
+
+- **FR-36** : Page publique de présentation du projet  
+- **FR-37** : Téléchargement de l’extension Chrome depuis le site  
+- **FR-38** : Instructions d’installation de l’extension Chrome
 ---
 
 ## 5. Exigences non fonctionnelles (NFR)
-> Performance / sécurité / disponibilité / UX / maintenabilité…
-- **NFR-1 (Performance) :** <ex. temps de réponse < 2s>
-- **NFR-2 (Sécurité) :** <ex. authentification requise>
-- **NFR-3 (UX) :** <ex. parcours en ≤ 3 clics>
-- **NFR-4 (Qualité) :** <ex. couverture minimale de tests>
+###  Performance
 
+- **NFR-1** : Temps de réponse inférieur à 2 secondes pour les actions principales
+
+###  Sécurité
+
+- **NFR-2** : Accès protégé par authentification  
+- **NFR-3** : Stockage sécurisé des mots de passe  
+- **NFR-4** : Aucune clé privée ni transaction blockchain
+- 
+###  Disponibilité & compatibilité
+
+- **NFR-6** : Accessible depuis un navigateur web moderne  
+- **NFR-7** : Extension compatible uniquement avec Google Chrome (Manifest V3)
+
+###  Expérience utilisateur (UX)
+
+- **NFR-8** : Actions principales en 3 clics maximum  
+- **NFR-9** : Interface simple et facile à comprendre
+
+###  Maintenabilité & qualité
+
+- **NFR-10** : Code structuré et modulaire  
+- **NFR-11** : Gestion des erreurs côté client et serveur  
+- **NFR-12** : Tests des fonctionnalités principales avant livraison
 ---
 
 ## 6. Contraintes
-- **C-1 (Technologie) :** <langage / framework imposé>
-- **C-2 (Plateforme) :** <web / mobile / desktop>
-- **C-3 (Délai) :** <dates de phases>
-- **C-4 (Outils) :** <Git, CI, etc.>
+
+- **C-1** : React (frontend) + Node.js API REST (backend)  
+- **C-2** : Application web + extension Chrome  
+- **C-3** : Respect des délais et phases du cours  
+- **C-4** : Utilisation de Git  
+- **C-5** : Extension uniquement sur Google Chrome  
+- **C-6** : Respect des bonnes pratiques de sécurité
 
 ---
 
 ## 7. Données & règles métier (si applicable)
-- **Entités principales :** <User, Order, ...>
-- **Règles métier :** <validation, calculs, permissions, etc.>
+### Entités
+- User
+- CryptoAddress
+- Admin
+
+### Règles
+- Une adresse appartient à un seul utilisateur
+- Chaque utilisateur gère uniquement ses adresses
+- L’admin ne modifie pas les adresses crypto
+- Validation obligatoire des adresses
+- Aucune clé privée stockée
+- Confirmation requise via l’extension
+- Synchronisation sécurisée et privée
 
 ---
 
 ## 8. Hypothèses & dépendances
 ### 8.1 Hypothèses
-- H-1 : <ex. utilisateurs ont un compte>
-- H-2 : <...>
+- **H-1** : Compte utilisateur valide requis  
+- **H-2** : Utilisation de Google Chrome  
+- **H-3** : Enregistrement d’adresses publiques uniquement  
+- **H-4** : Administrateurs autorisés  
+- **H-5** : Connexion Internet nécessaire
 
 ### 8.2 Dépendances
-- D-1 : <API externe / BD / service>
-- D-2 : <...>
+- **D-1** : API backend nécessaire au fonctionnement du système  
+- **D-2** : Base de données requise pour stocker utilisateurs et adresses  
+- **D-3** : Extension liée à l’API du serveur  
+- **D-4** : Extension compatible uniquement avec Google Chrome (Manifest V3)  
+- **D-5** : Connexion Internet requise
 
 ---
 
