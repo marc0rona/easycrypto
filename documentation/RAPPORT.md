@@ -16,11 +16,11 @@ On a enlevé des mots trop communs et de rue pour rendre le texte plus neutre de
 
 
 ## Liste des diagrammes + explications (Titre + texte explicatif + diagramme)
-### 1. Diagramme des cas d’utilisations
+### 1. [Diagramme des cas d’utilisations](/Diagrams/crypto-usecase-drawio.png)
 
-### 2. Diagramme de composants
+### 2. [Diagramme de composants](/Diagrams/crypto-component-simple.png)
 
-### 3. Diagramme des classes pour composant implémenté
+### 3. [Diagramme des classes pour composant implémenté](/Diagrams/Class-Diagram.drawio.png)
 
 
 
