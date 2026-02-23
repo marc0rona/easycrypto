@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- MARCO-ANDRES MORA - 2332530 // DRISS LAAZIRI - 2411533-->
+<!-- NOTE : Utiliser username :"Leboss" et password :"1234" pourt tester Singleton-->
+<html lang="fr">
+<head>
+    <meta http-equiv="content-type" content = "text/html; charset=utf-8">
+    <title>Singleton</title>
+    <!--CSS ici-->
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+        }
+        button {  margin-left : 10px; }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <h1>Authentification</h1>
+</header>
+
+<main class="main">
+    <div class="search-box">
+        <input type="text" id="username" placeholder="Username">
+        <input type="text" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+
+        <div id="status"></div>
+        <!-- gestion d'erreurs-->
+        <div id="error" class="hidden"></div>
+    </div>
+</main>
+<footer class="footer">
+    <p>SINGLETON TESTING PURPOSES</p>
+</footer>
+<!-- IMPORTANT : Fichier .JS situer ici a la fin du HTML-->
+ <script src="./AuthManager.js"></script>
+ <script>
+    function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const auth = AuthManager.Instance;
+
+        const success = auth.login(username, password);
+
+        const status = document.getElementById("status");
+
+        if (success)  {
+            status.innerText = "Connecté en tant que " + auth.getCurrentUser();
+        } 
+        else {
+            status.innerText = "Id incorrects";
+        }
+    }
+</script>
+</body>
+</html>
