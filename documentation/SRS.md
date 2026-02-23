@@ -8,9 +8,9 @@
 ---
 
 ## 1. Contexte & Objectif
-- **Contexte :** Quand une personne commence a devenir un investisseur dans la crypto, ce n'est pas comme la bourse normal, qui s`ouvre a une certaine heure (9am) et ensuite ferme (4pm) jusqu'à la prochaine journée. C'est des monnaies qui roule et bouge 24 heures chaque journées. De plus, les gens ne vont pas posséder juste 1 ou 2 monnaies à la fois, non, ils vont vouloir maximiser leur chance de faire de l'argent en investissant dans plusieurs crypto différente. Donc, un investisseur va posséder plusieurs adresses réparties sur différentes platformes et supports de manière très dispersé.
+- **Contexte :** Lorsqu'une personne commence a devenir un investisseur dans la crypto, ce n'est pas comme la bourse normal, qui s`ouvre a une certaine heure (9am) et ensuite ferme (4pm) jusqu'à la prochaine journée. C'est des monnaies qui roule et bouge 24 heures chaque journées. De plus, les gens ne vont pas posséder juste 1 ou 2 monnaies à la fois. Afin de diversifier leurs investissements et d’optimiser leurs opportunités de rendement, ils détiennent souvent plusieurs actif. Donc, un investisseur va posséder plusieurs adresses réparties sur différentes platformes et supports de manière très dispersé.
 
-  La personne average ne va pas avoir le temps de gérer tout ce brouhaha, alors tout cela entraîne une perte de temps et même des risques d’erreurs et une mauvaise organisation. Nous voulons pouvoir les aider en gérant ces adresses publiques de manière très simple et sécurisée.
+Pour un investisseur moyen, la gestion de cet ensemble d’informations peut représenter une tâche exigeante en temps, alors tout cela entraîne une perte de temps et même des risques d’erreurs et une mauvaise organisation. Nous voulons pouvoir les aider en gérant ces adresses publiques de manière très simple et sécurisée.
 
 - **Objectif principal :** L'objectif de ce projet est de fournir une plateforme simple permettant aux gens de bien organiser leur crypto et retrouver facilement leurs adresses qui sont publiques sans avoir a faire a différentes clés privées ou blockchains.
 - **Parties prenantes :**
