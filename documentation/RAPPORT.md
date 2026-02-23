@@ -17,11 +17,32 @@ On a enlevé des mots trop communs et de rue pour rendre le texte plus neutre de
 
 ## Liste des diagrammes + explications (Titre + texte explicatif + diagramme)
 ### 1. [Diagramme des cas d’utilisations](/documentation/Diagrams/crypto-usecase-drawio.png)
+Ce diagramme montre les principales interactions entres les acteurs  et le système EZ-Crypto. 
+Il y a 3 acteurs :
+- L'Utilisateur (Client) a gauche en haut
+- L'Administrateur a gacuhe en bas
+- L'Extension Chrome a droite
+
+  
+L'utilisateur peut gérer son compte (inscription, connexion, modifications et désactivation), consulter son tableau de bord (Dashboard) pour gérer ses adresses et synchroniser ses données avec l'extension. Il a aussi des fonctions d'authentifications pour la protection du site et la gestion des adresses qui doit être avoir un format valide toujours afin de garantir l'intégrité des données fournis.
+
+L'administrateur dispose de privilèges qui lui permettent de gérer les comptes du site (activation, désactivation et suppression), consulter les utilisateurs et surveiller le système en général. 
+
+L'extension Chrome agit comme un acteur externe capable de détecter des adresses crypto sur des pages web et les transmettres au serveur, en respectant les limites liées a Manifest V3 Google Chrome. 
 
 ### 2. [Diagramme de composants](/documentation/Diagrams/crypto-component-simple.png)
+Ce diagramme montre l'architecture logicielle du système en séparant le front-end, back-end et la couche des données. 
+
+Le front-end est composée du site version web et l'extension Chrome, qui communiquent avec le backend via REST API. Le back-end a plusieurs composants :
+- Module authentification pour la validation des id
+- Gestionnaire d'adresses qui traite les opérations liées aux portefeuilles crypto
+- Un validator pour assurer des bons formats d'adresses
+
+Toutes les requêtes passent par l'API REST, qui centralise toute le route du système et applique les contrôles nécessaires. La couche DATA ACCESS agit comme connecteur entre le back-end et la Base de données. 
+
 
 ### 3. [Diagramme des classes pour composant implémenté](/documentation/Diagrams/Class-Diagram.drawio.png)
-
+Il y a trois entités principales : **User**, **CryptoAdress** et **AdminLog** et suit une séparation : les contrôleurs (qui gèrent les requêtes API), les services qui contiennent la logique métier. Le diagramme montre également l’intégration de l’extension Chrome via la classe ChromeExtension et le module AddressDetector, responsables de la détection d’adresses sur les pages web et de leur transmission au serveur. Les relations entre classes montrent la gestion des rôles (user/admin), l’association entre utilisateurs et adresses crypto.
 
 
 ## Implémentation du patron Singleton
