@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { env } from '../config/env';
 import { AuthenticatedUser } from '../types';
+import { getAuthTokenFromCookieHeader } from '../utils/authCookie';
 import { AppError } from '../utils/AppError';
 
 interface JwtPayload {
@@ -19,13 +20,10 @@ export const authenticate = (
   next: NextFunction,
 ): void => {
   const authorizationHeader = req.headers.authorization;
-
-  if (!authorizationHeader?.startsWith('Bearer ')) {
-    next(createUnauthorizedError());
-    return;
-  }
-
-  const token = authorizationHeader.slice('Bearer '.length).trim();
+  const cookieToken = getAuthTokenFromCookieHeader(req.headers.cookie);
+  const token = authorizationHeader?.startsWith('Bearer ')
+    ? authorizationHeader.slice('Bearer '.length).trim()
+    : cookieToken;
 
   if (!token) {
     next(createUnauthorizedError());

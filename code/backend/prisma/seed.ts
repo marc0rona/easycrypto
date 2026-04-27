@@ -15,6 +15,7 @@ interface SeedAddress {
 
 interface SeedUser {
   email: string;
+  name: string;
   username: string;
   password: string;
   role: Role;
@@ -25,6 +26,7 @@ interface SeedUser {
 const seedUsers: SeedUser[] = [
   {
     email: 'admin@ezcrypto.com',
+    name: 'Admin User',
     username: 'admin',
     password: 'Admin123!',
     role: Role.ADMIN,
@@ -32,6 +34,7 @@ const seedUsers: SeedUser[] = [
   },
   {
     email: 'user@ezcrypto.com',
+    name: 'EZ User',
     username: 'user',
     password: 'User123!',
     role: Role.USER,
@@ -70,7 +73,73 @@ const seedUsers: SeedUser[] = [
     ],
   },
   {
+    email: 'idriss@user.com',
+    name: 'Idriss User',
+    username: 'idriss',
+    password: 'dark62413',
+    role: Role.USER,
+    status: Status.ACTIVE,
+    addresses: [
+      {
+        address: '1BoatSLRHtKNngkdXEeobR76b53LETtpyT',
+        label: 'Idriss BTC Test',
+        type: CryptoType.BTC,
+      },
+      {
+        address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
+        label: 'Idriss ETH Test',
+        type: CryptoType.ETH,
+      },
+      {
+        address: 'So11111111111111111111111111111111111111112',
+        label: 'Idriss SOL Test',
+        type: CryptoType.SOL,
+      },
+      {
+        address: 'M9x9wY3yZ3P7N8L6bT1c4d5e6f7g8h9j2k',
+        label: 'Idriss LTC Test',
+        type: CryptoType.LTC,
+      },
+      {
+        address: 'DH5yaieqoZN36fDVciNyRueRGvGLR3mr7L',
+        label: 'Idriss DOGE Test',
+        type: CryptoType.DOGE,
+      },
+      {
+        address: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        label: 'Idriss XRP Test',
+        type: CryptoType.XRP,
+      },
+      {
+        address: 'addr1q9d4kz5r8w2y3x7v6u5t4s3r2q1p0n9m8l7k6j5h4g3f2d1s0',
+        label: 'Idriss ADA Test',
+        type: CryptoType.ADA,
+      },
+      {
+        address: 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c',
+        label: 'Idriss TON Test',
+        type: CryptoType.TON,
+      },
+      {
+        address: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnop',
+        label: 'Idriss DOT Test',
+        type: CryptoType.DOT,
+      },
+      {
+        address: 'TNPeeaaFB7K9cmo4uQpcU32zGK8G1NYqeL',
+        label: 'Idriss TRX Test',
+        type: CryptoType.TRX,
+      },
+      {
+        address: 'cosmos1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq',
+        label: 'Idriss ATOM Test',
+        type: CryptoType.ATOM,
+      },
+    ],
+  },
+  {
     email: 'alice@ezcrypto.com',
+    name: 'Alice Rivera',
     username: 'alice',
     password: 'Alice123!',
     role: Role.USER,
@@ -160,6 +229,7 @@ const upsertUser = async (seedUser: SeedUser) => {
       email: seedUser.email,
     },
     update: {
+      name: seedUser.name,
       username: seedUser.username,
       password: hashedPassword,
       role: seedUser.role,
@@ -167,6 +237,7 @@ const upsertUser = async (seedUser: SeedUser) => {
     },
     create: {
       email: seedUser.email,
+      name: seedUser.name,
       username: seedUser.username,
       password: hashedPassword,
       role: seedUser.role,

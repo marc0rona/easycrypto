@@ -12,9 +12,12 @@ import { logger } from './utils/logger';
 const app = express();
 
 const chromeExtensionOriginPattern = /^chrome-extension:\/\/[a-p]{32}$/;
+const localDevelopmentOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 const isAllowedOrigin = (origin: string): boolean =>
-  origin === env.corsOrigin || chromeExtensionOriginPattern.test(origin);
+  env.allowedCorsOrigins.includes(origin) ||
+  (env.isDevelopment && localDevelopmentOriginPattern.test(origin)) ||
+  chromeExtensionOriginPattern.test(origin);
 
 const createRateLimitMessage = (message: string) => ({
   success: false,
@@ -58,6 +61,7 @@ app.use(
 
       callback(new AppError(`CORS origin denied: ${origin}`, 403));
     },
+    credentials: true,
   }),
 );
 app.use(express.json());

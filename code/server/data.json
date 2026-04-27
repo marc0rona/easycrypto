@@ -1,0 +1,101 @@
+[
+  {
+    "id": "bitcoin",
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "image": "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+    "current_price": 77660,
+    "price_change_percentage_24h": -0.11249,
+    "market_cap_rank": 1
+  },
+  {
+    "id": "ethereum",
+    "symbol": "ETH",
+    "name": "Ethereum",
+    "image": "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+    "current_price": 2318.85,
+    "price_change_percentage_24h": 0.44001,
+    "market_cap_rank": 2
+  },
+  {
+    "id": "ripple",
+    "symbol": "XRP",
+    "name": "XRP",
+    "image": "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442",
+    "current_price": 1.44,
+    "price_change_percentage_24h": 0.38489,
+    "market_cap_rank": 4
+  },
+  {
+    "id": "solana",
+    "symbol": "SOL",
+    "name": "Solana",
+    "image": "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756",
+    "current_price": 86.47,
+    "price_change_percentage_24h": 1.00638,
+    "market_cap_rank": 7
+  },
+  {
+    "id": "tron",
+    "symbol": "TRX",
+    "name": "TRON",
+    "image": "https://coin-images.coingecko.com/coins/images/1094/large/photo_2026-04-13_09-59-16.png?1776048311",
+    "current_price": 0.323359,
+    "price_change_percentage_24h": -1.62121,
+    "market_cap_rank": 8
+  },
+  {
+    "id": "dogecoin",
+    "symbol": "DOGE",
+    "name": "Dogecoin",
+    "image": "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409",
+    "current_price": 0.098791,
+    "price_change_percentage_24h": 1.65318,
+    "market_cap_rank": 10
+  },
+  {
+    "id": "cardano",
+    "symbol": "ADA",
+    "name": "Cardano",
+    "image": "https://coin-images.coingecko.com/coins/images/975/large/cardano.png?1696502090",
+    "current_price": 0.251587,
+    "price_change_percentage_24h": 1.22781,
+    "market_cap_rank": 15
+  },
+  {
+    "id": "litecoin",
+    "symbol": "LTC",
+    "name": "Litecoin",
+    "image": "https://coin-images.coingecko.com/coins/images/2/large/litecoin.png?1696501400",
+    "current_price": 56.68,
+    "price_change_percentage_24h": 1.44735,
+    "market_cap_rank": 25
+  },
+  {
+    "id": "the-open-network",
+    "symbol": "TON",
+    "name": "Toncoin",
+    "image": "https://coin-images.coingecko.com/coins/images/17980/large/photo_2024-09-10_17.09.00.jpeg?1725963446",
+    "current_price": 1.34,
+    "price_change_percentage_24h": 1.80371,
+    "market_cap_rank": 33
+  },
+  {
+    "id": "polkadot",
+    "symbol": "DOT",
+    "name": "Polkadot",
+    "image": "https://coin-images.coingecko.com/coins/images/12171/large/polkadot.jpg?1766533446",
+    "current_price": 1.26,
+    "price_change_percentage_24h": 2.20597,
+    "market_cap_rank": 43
+  },
+  {
+    "id": "cosmos",
+    "symbol": "ATOM",
+    "name": "Cosmos Hub",
+    "image": "https://coin-images.coingecko.com/coins/images/1481/large/cosmos_hub.png?1696502525",
+    "current_price": 2.03,
+    "price_change_percentage_24h": 5.79497,
+    "market_cap_rank": 70
+  }
+]

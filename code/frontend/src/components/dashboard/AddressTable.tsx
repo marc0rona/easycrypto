@@ -1,64 +1,83 @@
 import type { AddressRecord } from '../../types/address';
+import type { CoinData } from '../../utils/coingecko';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+  TableShell,
+} from '../ui/Table';
 import { AddressRow } from './AddressRow';
 
 export interface AddressTableProps {
   addresses: AddressRecord[];
+  coinDataByType: Record<string, CoinData | null | undefined>;
+  copiedAddressId: string | null;
+  loadingCoinTypes: Record<string, boolean>;
   onAddAddress: () => void;
-  onDelete: (addressId: string) => void;
+  onCopy: (address: AddressRecord) => void;
+  onDelete: (address: AddressRecord) => void;
   onEdit: (address: AddressRecord) => void;
 }
 
 export function AddressTable({
   addresses,
+  coinDataByType,
+  copiedAddressId,
+  loadingCoinTypes,
   onAddAddress,
+  onCopy,
   onDelete,
   onEdit,
 }: AddressTableProps) {
   if (addresses.length === 0) {
     return (
-      <section className="rounded-3xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center">
+      <Card className="px-6 py-14 text-center">
         <h2 className="text-2xl font-semibold text-white">No addresses yet</h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-300">
-          Start by adding your first crypto address so you can manage everything from one place.
+          Save your first address to start building your sending and receiving views.
         </p>
-        <button
-          className="mt-8 rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-          type="button"
-          onClick={onAddAddress}
-        >
-          Add your first address
-        </button>
-      </section>
+        <div className="mt-8 flex justify-center">
+          <Button size="lg" onClick={onAddAddress}>
+            Add your first address
+          </Button>
+        </div>
+      </Card>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+    <TableShell>
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead className="bg-white/[0.02]">
-            <tr className="text-left">
-              <th className="px-4 py-4 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Label
-              </th>
-              <th className="px-4 py-4 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Address
-              </th>
-              <th className="px-4 py-4 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Type
-              </th>
-              <th className="px-4 py-4 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow className="border-t-0 hover:bg-transparent">
+              <TableHeaderCell>Saved address</TableHeaderCell>
+              <TableHeaderCell>Address</TableHeaderCell>
+              <TableHeaderCell>Direction</TableHeaderCell>
+              <TableHeaderCell>Added</TableHeaderCell>
+              <TableHeaderCell>Actions</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {addresses.map((address) => (
-              <AddressRow key={address.id} address={address} onDelete={onDelete} onEdit={onEdit} />
+              <AddressRow
+                key={address.id}
+                address={address}
+                coinData={coinDataByType[address.type]}
+                isCoinLoading={Boolean(loadingCoinTypes[address.type])}
+                isCopied={copiedAddressId === address.id}
+                onCopy={onCopy}
+                onDelete={onDelete}
+                onEdit={onEdit}
+              />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
-    </section>
+    </TableShell>
   );
 }

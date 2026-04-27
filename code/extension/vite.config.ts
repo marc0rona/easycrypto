@@ -1,12 +1,20 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 
 const rootDir = fileURLToPath(new URL('.', import.meta.url));
+const require = createRequire(import.meta.url);
+const tailwindcss = require(
+  require.resolve('@tailwindcss/vite', {
+    paths: [resolve(rootDir, '../frontend')],
+  }),
+).default as () => unknown;
 const manifestPath = resolve(rootDir, 'manifest.json');
-const defaultApiBaseUrl = 'https://api.ez-crypt0.example.com/api/v1';
+const backendEnvPath = resolve(rootDir, '../backend/.env');
+const productionApiBaseUrl = 'https://api.ez-crypt0.example.com/api/v1';
 
 function toBuiltFileName(file: string): string {
   const name = file.split('/').pop() ?? file;
@@ -18,11 +26,74 @@ function normalizeApiBaseUrl(value: string): string {
   return value.replace(/\/+$/, '');
 }
 
-function toHostPermission(apiBaseUrl: string): string {
-  return `${new URL(apiBaseUrl).origin}/*`;
+function toLocalApiBaseUrl(host: 'localhost' | '127.0.0.1', port: number): string {
+  return `http://${host}:${port}/api/v1`;
 }
 
-function emitExtensionManifest(apiHostPermission: string) {
+function uniqueValues<T>(values: T[]): T[] {
+  return Array.from(new Set(values));
+}
+
+function parsePortValue(value: string | undefined): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalizedValue = value.trim().replace(/^['"]|['"]$/g, '');
+  const parsedPort = Number(normalizedValue);
+
+  if (!Number.isInteger(parsedPort) || parsedPort <= 0) {
+    return null;
+  }
+
+  return parsedPort;
+}
+
+function readBackendPort(): number | null {
+  if (!existsSync(backendEnvPath)) {
+    return null;
+  }
+
+  const backendEnvFile = readFileSync(backendEnvPath, 'utf8');
+  const portMatch = backendEnvFile.match(/^PORT=(.+)$/m);
+
+  return parsePortValue(portMatch?.[1]);
+}
+
+function getDefaultApiBaseUrl(): string {
+  const backendPort = readBackendPort();
+
+  if (backendPort) {
+    return toLocalApiBaseUrl('localhost', backendPort);
+  }
+
+  return productionApiBaseUrl;
+}
+
+function getLocalFallbackApiBaseUrls(): string[] {
+  const backendPort = readBackendPort();
+
+  if (!backendPort) {
+    return [];
+  }
+
+  return uniqueValues([
+    toLocalApiBaseUrl('localhost', backendPort),
+    toLocalApiBaseUrl('127.0.0.1', backendPort),
+  ]);
+}
+
+function getApiBaseUrls(configuredApiBaseUrl?: string): string[] {
+  const primaryApiBaseUrl = normalizeApiBaseUrl(configuredApiBaseUrl || getDefaultApiBaseUrl());
+
+  return uniqueValues([primaryApiBaseUrl, ...getLocalFallbackApiBaseUrls()]);
+}
+
+function toHostPermissions(apiBaseUrls: string[]): string[] {
+  return uniqueValues(apiBaseUrls.map((apiBaseUrl) => `${new URL(apiBaseUrl).origin}/*`));
+}
+
+function emitExtensionManifest(apiHostPermissions: string[]) {
   return {
     name: 'emit-extension-manifest',
     apply: 'build',
@@ -38,7 +109,7 @@ function emitExtensionManifest(apiHostPermission: string) {
         ...script,
         js: script.js.map(toBuiltFileName),
       }));
-      manifest.host_permissions = [apiHostPermission];
+      manifest.host_permissions = uniqueValues([...manifest.host_permissions, ...apiHostPermissions]);
 
       this.emitFile({
         type: 'asset',
@@ -65,14 +136,19 @@ function removeUnusedCssAssets() {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, rootDir, '');
-  const apiBaseUrl = normalizeApiBaseUrl(env.EZ_CRYPT0_API_BASE_URL || defaultApiBaseUrl);
-  const apiHostPermission = toHostPermission(apiBaseUrl);
+  const apiBaseUrls = getApiBaseUrls(env.EZ_CRYPT0_API_BASE_URL);
+  const apiHostPermissions = toHostPermissions(apiBaseUrls);
 
   return {
     define: {
-      __EZ_CRYPT0_API_BASE_URL__: JSON.stringify(apiBaseUrl),
+      __EZ_CRYPT0_API_BASE_URL__: JSON.stringify(apiBaseUrls[0]),
     },
-    plugins: [react(), removeUnusedCssAssets(), emitExtensionManifest(apiHostPermission)],
+    plugins: [
+      react(),
+      tailwindcss(),
+      removeUnusedCssAssets(),
+      emitExtensionManifest(apiHostPermissions),
+    ],
     publicDir: 'public',
     build: {
       outDir: 'dist',
