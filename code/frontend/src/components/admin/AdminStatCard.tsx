@@ -1,15 +1,19 @@
-export interface AdminStatCardProps {
+import type { HTMLAttributes } from 'react';
+
+import { Card } from '../ui/Card';
+
+export interface AdminStatCardProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
   meta?: string;
   value: string;
 }
 
-export function AdminStatCard({ label, meta, value }: AdminStatCardProps) {
+export function AdminStatCard({ className = '', label, meta, value, ...props }: AdminStatCardProps) {
   return (
-    <article className="rounded-2xl border border-amber-400/15 bg-amber-400/[0.04] p-5">
+    <Card className={['p-6', className].join(' ')} tone="muted" {...props}>
       <p className="text-sm font-medium text-neutral-400">{label}</p>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-white">{value}</p>
-      {meta ? <p className="mt-2 text-sm text-amber-300">{meta}</p> : null}
-    </article>
+      <p className="mt-5 text-3xl font-semibold tracking-tight text-white">{value}</p>
+      {meta ? <p className="mt-3 text-sm leading-6 text-neutral-300">{meta}</p> : null}
+    </Card>
   );
 }

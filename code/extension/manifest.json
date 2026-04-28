@@ -4,7 +4,11 @@
   "description": "Detect and securely save crypto addresses from web pages.",
   "version": "1.0.1",
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://api.ez-crypt0.example.com/*"],
+  "host_permissions": [
+    "https://api.ez-crypt0.example.com/*",
+    "https://api.coingecko.com/*",
+    "http://localhost:3000/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

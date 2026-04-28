@@ -7,22 +7,28 @@ import {
 } from 'react';
 
 import {
+  changePassword as changePasswordRequest,
   getCurrentUser,
   login as loginRequest,
   logout as logoutRequest,
   register as registerRequest,
+  updateProfile as updateProfileRequest,
+  type ChangePasswordPayload,
   type CurrentUser,
   type LoginPayload,
   type RegisterPayload,
+  type UpdateProfilePayload,
 } from '../api/auth.api';
 
 export interface AuthContextValue {
+  changeUserPassword: (data: ChangePasswordPayload) => Promise<void>;
   fetchCurrentUser: () => Promise<CurrentUser | null>;
   isAuthenticated: boolean;
   loading: boolean;
   login: (data: LoginPayload) => Promise<CurrentUser>;
   logout: () => Promise<void>;
   register: (data: RegisterPayload) => Promise<CurrentUser>;
+  updateUser: (data: UpdateProfilePayload) => Promise<CurrentUser>;
   user: CurrentUser | null;
 }
 
@@ -89,6 +95,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, []);
 
+  const updateUser = useCallback(async (data: UpdateProfilePayload) => {
+    const updatedUser = await updateProfileRequest(data);
+    setUser(updatedUser);
+    setIsAuthenticated(true);
+    return updatedUser;
+  }, []);
+
+  const changeUserPassword = useCallback(async (data: ChangePasswordPayload) => {
+    await changePasswordRequest(data);
+    setIsAuthenticated(true);
+  }, []);
+
   useEffect(() => {
     void fetchCurrentUser();
   }, [fetchCurrentUser]);
@@ -102,6 +120,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         login,
         register,
         logout,
+        updateUser,
+        changeUserPassword,
         fetchCurrentUser,
       }}
     >

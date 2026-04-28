@@ -4,13 +4,11 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { PublicLayout } from '../layouts/PublicLayout';
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
-import { SystemStatusPage } from '../pages/admin/SystemStatusPage';
+import { AdminProfilePage } from '../pages/admin/AdminProfilePage';
 import { UsersPage } from '../pages/admin/UsersPage';
 import { AddressesPage } from '../pages/dashboard/AddressesPage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
 import { ProfilePage } from '../pages/dashboard/ProfilePage';
-import { DownloadPage } from '../pages/public/DownloadPage';
-import { InstallPage } from '../pages/public/InstallPage';
 import { LandingPage } from '../pages/public/LandingPage';
 import { LoginPage } from '../pages/public/LoginPage';
 import { RegisterPage } from '../pages/public/RegisterPage';
@@ -22,8 +20,6 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<LandingPage />} />
-        <Route path="/download" element={<DownloadPage />} />
-        <Route path="/install" element={<InstallPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>
@@ -32,6 +28,7 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="addresses" element={<AddressesPage />} />
+          <Route path="swap" element={<Navigate replace to="/dashboard" />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>
@@ -40,7 +37,8 @@ export function AppRoutes() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="users" element={<UsersPage />} />
-          <Route path="system" element={<SystemStatusPage />} />
+          <Route path="profile" element={<AdminProfilePage />} />
+          <Route path="system" element={<Navigate replace to="/admin" />} />
         </Route>
       </Route>
 

@@ -1,4 +1,4 @@
-import { CryptoType, Role } from '@prisma/client';
+import { AddressDirection, CryptoType, Role } from '@prisma/client';
 
 export interface MessageResponse {
   message: string;
@@ -6,6 +6,7 @@ export interface MessageResponse {
 
 export interface AddressListItem {
   address: string;
+  direction: AddressDirection;
   type: CryptoType;
 }
 
@@ -17,6 +18,7 @@ export interface AddressRecord {
   id: string;
   address: string;
   label: string | null;
+  direction: AddressDirection;
   type: CryptoType;
   createdAt: Date;
 }

@@ -1,136 +1,277 @@
-import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 
-import { ADDRESS_TYPES, type AddressFormValues } from '../../types/address';
+import type { CoinData } from '../../utils/coingecko';
+import { getCoinData } from '../../utils/coingecko';
+import {
+  detectCryptoType,
+  isValidCryptoAddress,
+  normalizeAddress,
+  normalizeAddressForComparison,
+} from '../../utils/detector';
+import { type AddressFormValues, type AddressRecord } from '../../types/address';
+import { Modal } from '../ui/Modal';
+import { DetectedCoinPreview } from './DetectedCoinPreview';
 
 export interface AddAddressModalProps {
+  existingAddresses: AddressRecord[];
   isOpen: boolean;
+  isSubmitting?: boolean;
   onClose: () => void;
-  onSubmit: (values: AddressFormValues) => void;
+  onSubmit: (values: AddressFormValues) => Promise<void>;
+  submitError?: string;
 }
 
 const initialFormValues: AddressFormValues = {
   label: '',
   address: '',
+  direction: 'RECEIVING',
   type: 'ETH',
 };
 
-export function AddAddressModal({ isOpen, onClose, onSubmit }: AddAddressModalProps) {
+const fieldLabelClassName =
+  'block text-xs font-semibold uppercase tracking-[0.18em] text-[#595c5e]';
+
+const underlineInputClassName =
+  'w-full border-0 border-b border-[#abadaf] bg-transparent px-0 py-3 text-[#2c2f31] placeholder:text-[#747779]/65 transition-all duration-300 focus:border-[#0052d0] focus:outline-none focus:ring-0';
+
+function addressExists(address: string, existingAddresses: AddressRecord[]) {
+  const normalizedAddress = normalizeAddressForComparison(address);
+
+  return existingAddresses.some(
+    (currentAddress) =>
+      normalizeAddressForComparison(currentAddress.address) === normalizedAddress,
+  );
+}
+
+export function AddAddressModal({
+  existingAddresses,
+  isOpen,
+  isSubmitting = false,
+  onClose,
+  onSubmit,
+  submitError,
+}: AddAddressModalProps) {
   const [formValues, setFormValues] = useState<AddressFormValues>(initialFormValues);
+  const [coinData, setCoinData] = useState<CoinData | null>(null);
   const [error, setError] = useState('');
+  const [isCoinLoading, setIsCoinLoading] = useState(false);
+
+  const hasAddressInput = normalizeAddress(formValues.address).length > 0;
+  const detectedType = useMemo(() => detectCryptoType(formValues.address), [formValues.address]);
 
   useEffect(() => {
     if (isOpen) {
       setFormValues(initialFormValues);
+      setCoinData(null);
       setError('');
+      setIsCoinLoading(false);
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!hasAddressInput || !detectedType) {
+      setCoinData(null);
+      setIsCoinLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    setIsCoinLoading(true);
+
+    void getCoinData(detectedType)
+      .then((nextCoinData) => {
+        if (!isCancelled) {
+          setCoinData(nextCoinData);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setCoinData(null);
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsCoinLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [detectedType, hasAddressInput]);
+
   const handleChange =
-    (field: keyof AddressFormValues) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    (field: keyof AddressFormValues) => (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.target.value;
+      const nextDetectedType = field === 'address' ? detectCryptoType(nextValue) : null;
+
       setFormValues((previous) => ({
         ...previous,
-        [field]: event.target.value,
+        [field]: nextValue,
+        ...(field === 'address'
+          ? {
+              type: nextDetectedType ?? previous.type,
+            }
+          : {}),
       }));
+      setError('');
     };
 
+  const handleDirectionChange = useCallback((nextDirection: AddressFormValues['direction']) => {
+    setFormValues((previous) => ({
+      ...previous,
+      direction: nextDirection,
+    }));
+    setError('');
+  }, []);
+
   const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (!formValues.address.trim()) {
+      const nextValues: AddressFormValues = {
+        ...formValues,
+        address: normalizeAddress(formValues.address),
+        label: formValues.label.trim(),
+      };
+
+      if (!nextValues.address) {
         setError('Address is required.');
         return;
       }
 
-      onSubmit({
-        ...formValues,
-        address: formValues.address.trim(),
-        label: formValues.label.trim(),
+      const resolvedType = detectCryptoType(nextValues.address);
+
+      if (!resolvedType || !isValidCryptoAddress(nextValues.address, resolvedType)) {
+        setError('Invalid address');
+        return;
+      }
+
+      if (addressExists(nextValues.address, existingAddresses)) {
+        setError('Address already exists');
+        return;
+      }
+
+      setError('');
+      await onSubmit({
+        ...nextValues,
+        type: resolvedType,
       });
     },
-    [formValues, onSubmit],
+    [existingAddresses, formValues, onSubmit],
   );
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-black/30">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-white">Add Address</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-300">
-              Add a new crypto address to your workspace.
-            </p>
+    <Modal
+      description="Save a crypto address for quick access"
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add New Address"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6 px-5 pb-6 sm:px-8 sm:pb-8">
+          <label className="block space-y-2">
+            <span className={fieldLabelClassName}>Label</span>
+            <div className="group relative">
+              <input
+                className={underlineInputClassName}
+                placeholder="e.g. My Binance Wallet"
+                type="text"
+                value={formValues.label}
+                onChange={handleChange('label')}
+              />
+              <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#0052d0] transition-all duration-300 group-focus-within:w-full" />
+            </div>
+          </label>
+
+          <div className="space-y-2">
+            <label className={fieldLabelClassName}>Address</label>
+            <div className="group relative">
+              <input
+                className={[
+                  underlineInputClassName,
+                  error || submitError
+                    ? 'border-[#b31b25] focus:border-[#b31b25]'
+                    : '',
+                ].join(' ')}
+                placeholder="Paste wallet address"
+                type="text"
+                value={formValues.address}
+                onChange={handleChange('address')}
+              />
+              <div
+                className={[
+                  'absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-focus-within:w-full',
+                  error || submitError ? 'w-full bg-[#b31b25]' : 'w-0 bg-[#0052d0]',
+                ].join(' ')}
+              />
+            </div>
+
+            {error || submitError ? (
+              <div className="mt-1.5 flex items-center gap-1 text-[#b31b25]">
+                <span className="material-symbols-outlined text-[16px]">error</span>
+                <span className="text-xs font-medium">{error || submitError}</span>
+              </div>
+            ) : null}
           </div>
 
+          <div className="space-y-2">
+            <label className={fieldLabelClassName}>Coin / Network</label>
+            <DetectedCoinPreview
+              coinData={coinData}
+              detectedType={detectedType}
+              hasAddressInput={hasAddressInput}
+              isLoading={isCoinLoading}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className={fieldLabelClassName}>Direction</label>
+            <div className="grid grid-cols-2 gap-2 rounded-full bg-[#eef1f3] p-1">
+              {(['RECEIVING', 'SENDING'] as const).map((directionOption) => {
+                const isActive = formValues.direction === directionOption;
+
+                return (
+                  <button
+                    className={[
+                      'rounded-full px-4 py-2.5 text-sm font-semibold transition-all',
+                      isActive
+                        ? 'bg-white text-[#2c2f31] shadow-[0_10px_25px_rgba(15,23,42,0.08)]'
+                        : 'text-[#5b636f] hover:text-[#2c2f31]',
+                    ].join(' ')}
+                    key={directionOption}
+                    type="button"
+                    onClick={() => {
+                      handleDirectionChange(directionOption);
+                    }}
+                  >
+                    {directionOption === 'RECEIVING' ? 'Receiving' : 'Sending'}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 bg-[#eef1f3] px-5 py-5 sm:flex-row-reverse sm:px-8 sm:py-6">
           <button
-            className="rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            className="flex w-full items-center justify-center rounded-full bg-[#0052d0] px-8 py-3.5 text-sm font-bold text-[#f1f2ff] shadow-lg shadow-[#0052d0]/20 transition-all hover:opacity-95 disabled:cursor-not-allowed disabled:bg-[#0052d0]/50 disabled:text-[#f1f2ff]/70 disabled:shadow-none sm:w-auto"
+            disabled={isSubmitting}
+            type="submit"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Address'}
+          </button>
+          <button
+            className="w-full rounded-full bg-transparent px-8 py-3.5 text-sm font-bold text-[#0052d0] transition-all hover:bg-[#0052d0]/5 sm:w-auto"
+            disabled={isSubmitting}
             type="button"
             onClick={onClose}
           >
-            Close
+            Cancel
           </button>
         </div>
-
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-200">Label</span>
-            <input
-              className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/80"
-              placeholder="Optional name"
-              type="text"
-              value={formValues.label}
-              onChange={handleChange('label')}
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-200">Address</span>
-            <input
-              className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/80"
-              placeholder="Paste wallet address"
-              type="text"
-              value={formValues.address}
-              onChange={handleChange('address')}
-            />
-            {error ? <span className="text-sm text-rose-300">{error}</span> : null}
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-200">Type</span>
-            <select
-              className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/80"
-              value={formValues.type}
-              onChange={handleChange('type')}
-            >
-              {ADDRESS_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-              type="button"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-              type="submit"
-            >
-              Save Address
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

@@ -1,15 +1,19 @@
-export interface StatCardProps {
+import type { HTMLAttributes } from 'react';
+
+import { Card } from '../ui/Card';
+
+export interface StatCardProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
   meta?: string;
   value: string;
 }
 
-export function StatCard({ label, meta, value }: StatCardProps) {
+export function StatCard({ className = '', label, meta, value, ...props }: StatCardProps) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <Card className={['p-6', className].join(' ')} {...props}>
       <p className="text-sm font-medium text-slate-400">{label}</p>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-white">{value}</p>
-      {meta ? <p className="mt-2 text-sm text-cyan-300">{meta}</p> : null}
-    </article>
+      <p className="mt-5 text-3xl font-semibold tracking-tight text-white">{value}</p>
+      {meta ? <p className="mt-3 text-sm leading-6 text-slate-300">{meta}</p> : null}
+    </Card>
   );
 }

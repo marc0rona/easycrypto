@@ -16,6 +16,8 @@ export interface ApiError {
   status: number;
 }
 
+export interface ApiErrorWithMessage extends Error, ApiError {}
+
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
   headers: {
@@ -24,7 +26,16 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-export function normalizeApiError(error: unknown): ApiError {
+export function normalizeApiError(error: unknown): ApiErrorWithMessage {
+  const createApiError = (message: string, status = 0, code?: string, details?: unknown) => {
+    const apiError = new Error(message) as ApiErrorWithMessage;
+    apiError.status = status;
+    apiError.code = code;
+    apiError.details = details;
+
+    return apiError;
+  };
+
   if (axios.isAxiosError<ApiErrorPayload>(error)) {
     const responseData = error.response?.data;
     const message =
@@ -33,25 +44,19 @@ export function normalizeApiError(error: unknown): ApiError {
       error.message ||
       'An unexpected API error occurred.';
 
-    return {
-      status: error.response?.status ?? 0,
+    return createApiError(
       message,
-      code: responseData?.code ?? error.code,
-      details: responseData?.details ?? responseData,
-    };
+      error.response?.status ?? 0,
+      responseData?.code ?? error.code,
+      responseData?.details ?? responseData,
+    );
   }
 
   if (error instanceof Error) {
-    return {
-      status: 0,
-      message: error.message,
-    };
+    return createApiError(error.message);
   }
 
-  return {
-    status: 0,
-    message: 'An unknown error occurred.',
-  };
+  return createApiError('An unknown error occurred.');
 }
 
 apiClient.interceptors.request.use(

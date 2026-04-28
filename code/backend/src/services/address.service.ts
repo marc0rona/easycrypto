@@ -1,4 +1,4 @@
-import { CryptoType, Prisma } from '@prisma/client';
+import { AddressDirection, CryptoType, Prisma } from '@prisma/client';
 
 import prisma from '../config/prisma';
 import {
@@ -11,11 +11,14 @@ import { isAddressValidForType } from '../validators/address.validator';
 
 interface CreateAddressInput {
   address?: unknown;
+  direction?: unknown;
   label?: unknown;
   type?: unknown;
 }
 
 interface UpdateAddressInput {
+  address?: unknown;
+  direction?: unknown;
   label?: unknown;
   type?: unknown;
 }
@@ -24,6 +27,7 @@ interface ExtensionAddressResponse {
   data: {
     id: string;
     address: string;
+    direction: AddressDirection;
     type: CryptoType;
   };
   created: boolean;
@@ -39,6 +43,7 @@ const createNotFoundError = (message: string): AppError =>
   new AppError(message, 404);
 
 const supportedCryptoTypes = new Set(Object.values(CryptoType));
+const supportedAddressDirections = new Set(Object.values(AddressDirection));
 
 const normalizeCryptoType = (value: unknown): CryptoType | null => {
   if (typeof value !== 'string') {
@@ -52,6 +57,20 @@ const normalizeCryptoType = (value: unknown): CryptoType | null => {
   }
 
   return normalizedValue as CryptoType;
+};
+
+const normalizeAddressDirection = (value: unknown): AddressDirection | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalizedValue = value.trim().toUpperCase();
+
+  if (!supportedAddressDirections.has(normalizedValue as AddressDirection)) {
+    return null;
+  }
+
+  return normalizedValue as AddressDirection;
 };
 
 class AddressService {
@@ -87,7 +106,13 @@ class AddressService {
   private async getOwnedAddressOrThrow(
     addressId: string,
     userId: string,
-  ): Promise<{ id: string; userId: string; address: string }> {
+  ): Promise<{
+    id: string;
+    userId: string;
+    address: string;
+    direction: AddressDirection;
+    type: CryptoType;
+  }> {
     const existingAddress = await prisma.cryptoAddress.findUnique({
       where: {
         id: addressId,
@@ -95,6 +120,8 @@ class AddressService {
       select: {
         id: true,
         address: true,
+        direction: true,
+        type: true,
         userId: true,
       },
     });
@@ -118,6 +145,7 @@ class AddressService {
       select: {
         id: true,
         address: true,
+        direction: true,
         label: true,
         type: true,
         createdAt: true,
@@ -135,6 +163,10 @@ class AddressService {
   ): Promise<AddressCreateResponse> {
     const address =
       typeof input.address === 'string' ? input.address.trim() : '';
+    const direction =
+      input.direction === undefined
+        ? AddressDirection.RECEIVING
+        : normalizeAddressDirection(input.direction);
     const type = normalizeCryptoType(input.type);
     const label =
       typeof input.label === 'string'
@@ -143,8 +175,8 @@ class AddressService {
           ? null
           : null;
 
-    if (!address || !type) {
-      throw createBadRequestError('Address and type are required');
+    if (!address || !type || !direction) {
+      throw createBadRequestError('Address, type, and direction are required');
     }
 
     if (input.label !== undefined && typeof input.label !== 'string') {
@@ -161,6 +193,7 @@ class AddressService {
       const createdAddress = await prisma.cryptoAddress.create({
         data: {
           address,
+          direction,
           label,
           type,
           userId,
@@ -168,6 +201,7 @@ class AddressService {
         select: {
           id: true,
           address: true,
+          direction: true,
           label: true,
           type: true,
           createdAt: true,
@@ -195,14 +229,18 @@ class AddressService {
   ): Promise<ExtensionAddressResponse> {
     const address =
       typeof input.address === 'string' ? input.address.trim() : '';
+    const direction =
+      input.direction === undefined
+        ? AddressDirection.RECEIVING
+        : normalizeAddressDirection(input.direction);
     const type = normalizeCryptoType(input.type);
     const label =
       typeof input.label === 'string' && input.label.trim()
         ? input.label.trim()
         : 'Imported from extension';
 
-    if (!address || !type) {
-      throw createBadRequestError('Address and type are required');
+    if (!address || !type || !direction) {
+      throw createBadRequestError('Address, type, and direction are required');
     }
 
     if (!isAddressValidForType(address, type)) {
@@ -218,6 +256,7 @@ class AddressService {
       select: {
         id: true,
         address: true,
+        direction: true,
         type: true,
       },
     });
@@ -233,6 +272,7 @@ class AddressService {
       const createdAddress = await prisma.cryptoAddress.create({
         data: {
           address,
+          direction,
           type,
           label,
           userId,
@@ -240,6 +280,7 @@ class AddressService {
         select: {
           id: true,
           address: true,
+          direction: true,
           type: true,
         },
       });
@@ -262,6 +303,7 @@ class AddressService {
           select: {
             id: true,
             address: true,
+            direction: true,
             type: true,
           },
         });
@@ -286,9 +328,28 @@ class AddressService {
     const existingAddress = await this.getOwnedAddressOrThrow(addressId, userId);
 
     const updateData: {
+      address?: string;
+      direction?: AddressDirection;
       label?: string | null;
       type?: CryptoType;
     } = {};
+
+    const nextAddress =
+      input.address === undefined
+        ? existingAddress.address
+        : typeof input.address === 'string'
+          ? input.address.trim()
+          : null;
+    const nextType =
+      input.type === undefined ? existingAddress.type : normalizeCryptoType(input.type);
+    const nextDirection =
+      input.direction === undefined
+        ? existingAddress.direction
+        : normalizeAddressDirection(input.direction);
+
+    if (input.address !== undefined && !nextAddress) {
+      throw createBadRequestError('Address is required');
+    }
 
     if (input.label !== undefined) {
       if (typeof input.label !== 'string') {
@@ -299,19 +360,37 @@ class AddressService {
     }
 
     if (input.type !== undefined) {
-      const type = normalizeCryptoType(input.type);
-
-      if (!type) {
+      if (!nextType) {
         throw createBadRequestError('Type cannot be empty');
       }
+    }
 
-      if (!isAddressValidForType(existingAddress.address, type)) {
-        throw createBadRequestError(`Invalid ${type} address format`);
-      }
+    if (input.direction !== undefined && !nextDirection) {
+      throw createBadRequestError('Direction cannot be empty');
+    }
 
-      await this.ensureUniqueAddress(userId, existingAddress.address, type, addressId);
+    const validatedNextAddress = nextAddress ?? existingAddress.address;
 
-      updateData.type = type;
+    if (!nextType || !isAddressValidForType(validatedNextAddress, nextType)) {
+      throw createBadRequestError(`Invalid ${nextType ?? existingAddress.type} address format`);
+    }
+
+    if (validatedNextAddress !== existingAddress.address || nextType !== existingAddress.type) {
+      await this.ensureUniqueAddress(userId, validatedNextAddress, nextType, addressId);
+    }
+
+    if (validatedNextAddress !== existingAddress.address) {
+      updateData.address = validatedNextAddress;
+    }
+
+    if (nextType !== existingAddress.type) {
+      updateData.type = nextType;
+    }
+
+    const resolvedNextDirection = nextDirection ?? existingAddress.direction;
+
+    if (resolvedNextDirection !== existingAddress.direction) {
+      updateData.direction = resolvedNextDirection;
     }
 
     try {
@@ -323,6 +402,7 @@ class AddressService {
         select: {
           id: true,
           address: true,
+          direction: true,
           label: true,
           type: true,
           createdAt: true,
