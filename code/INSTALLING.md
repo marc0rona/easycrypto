@@ -1,102 +1,266 @@
-# EZ-CRYPT0 Installing Guide
+# EZ-CRYPT0 Installation Guide
 
 This project does not use one root `package.json`.
-Install dependencies separately inside each app:
+You need to install and run each part separately:
 
-- `backend/`
-- `frontend/`
-- `extension/`
+- `backend/` -> REST API + PostgreSQL
+- `server/` -> local market API for coin prices
+- `frontend/` -> web app
+- `extension/` -> optional Chrome extension
+
+If you want the web app to work properly, run at least:
+
+1. PostgreSQL
+2. `backend/`
+3. `server/`
+4. `frontend/`
 
 ## Prerequisites
 
-- Node.js and npm
-- PostgreSQL running locally for the backend
-- Google Chrome for the extension
+Install these first:
 
-## 1. Backend
+- Node.js LTS
+- npm
+- PostgreSQL
+- Google Chrome if you want to use the extension
 
-From the project root:
+## Ports Used In This Guide
+
+This guide uses these local ports:
+
+- Backend API: `5050`
+- Market API: `3000`
+- Frontend: `5173`
+
+`5050` is used for the backend so it matches the frontend proxy configuration already in the repo.
+
+## 1. Open The Project Root
 
 ```bash
-cd backend
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code
+```
+
+## 2. Install Dependencies
+
+Run these commands one time:
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/backend
 npm install
+```
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/server
+npm install
+```
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/frontend
+npm install
+```
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/extension
+npm install
+```
+
+## 3. Create The Backend Environment File
+
+Copy the example file:
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/backend
 cp .env.example .env
 ```
 
-Fill `backend/.env` with values like this:
+Open `backend/.env` and set it like this:
 
 ```env
-PORT=5000
+PORT=5050
 NODE_ENV=development
-DATABASE_URL=postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/ez_crypt0?schema=public
-JWT_SECRET=change-this-secret
+DATABASE_URL=postgresql://YOUR_POSTGRES_USER:YOUR_POSTGRES_PASSWORD@127.0.0.1:5432/ez_crypt0?schema=public
+JWT_SECRET=replace-this-with-a-long-random-secret
 JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=replace-this-with-another-long-random-secret
+JWT_REFRESH_EXPIRES_IN=30d
+CORS_ORIGIN=http://localhost:5173
 ```
 
-Then run the database setup and start the API:
+Notes:
+
+- Replace `YOUR_POSTGRES_USER` and `YOUR_POSTGRES_PASSWORD` with your PostgreSQL credentials.
+- If your PostgreSQL user does not use a password locally, remove `:YOUR_POSTGRES_PASSWORD`.
+- Keep `PORT=5050` unless you also change the frontend proxy config.
+
+Example without a password:
+
+```env
+DATABASE_URL=postgresql://postgres@127.0.0.1:5432/ez_crypt0?schema=public
+```
+
+## 4. Create The PostgreSQL Database
+
+Create the database before running Prisma migrations.
+
+Example command:
 
 ```bash
-npx prisma migrate dev
+createdb -h 127.0.0.1 -U YOUR_POSTGRES_USER ez_crypt0
+```
+
+If the database already exists, you can skip this step.
+
+## 5. Run The Backend
+
+Open a new terminal and run:
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/backend
+npm run migrate:deploy
 npm run seed
 npm run dev
 ```
 
-Useful note:
+When it starts, the API should be available at:
 
-- `npm run seed` creates demo accounts such as `admin@ezcrypto.com` and `user@ezcrypto.com`
+```txt
+http://localhost:5050/api/v1
+```
 
-## 2. Frontend
+Seeded accounts you can use right away:
 
-From the project root:
+- Admin: `admin@ezcrypto.com` / `Admin123!`
+- User: `user@ezcrypto.com` / `User123!`
+
+## 6. Run The Local Market API
+
+Open another terminal and run:
 
 ```bash
-cd frontend
-npm install
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/server
+npm start
+```
+
+When it starts, the market API should be available at:
+
+```txt
+http://localhost:3000/market
+```
+
+This service is used by the frontend and extension for price data.
+
+## 7. Run The Frontend
+
+Open another terminal and run:
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/frontend
 npm run dev
 ```
 
-The frontend runs with Vite on `http://localhost:5173`.
+Then open:
 
-Current project note:
-
-- the frontend API layer is still using mock data, so it can start even if the backend is not running
-
-## 3. Extension
-
-From the project root:
-
-```bash
-cd extension
-npm install
-EZ_CRYPT0_API_BASE_URL=http://localhost:5000/api/v1 npm run build
+```txt
+http://localhost:5173
 ```
 
-If you want rebuilds while developing:
+At this point, the web application should be running.
+
+## 8. Build And Load The Chrome Extension (Optional)
+
+Open another terminal and run:
 
 ```bash
-cd extension
-EZ_CRYPT0_API_BASE_URL=http://localhost:5000/api/v1 npm run dev
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/extension
+npm run build
 ```
 
-Then load the extension in Chrome:
+Then load it in Chrome:
 
 1. Open `chrome://extensions`
-2. Enable Developer mode
-3. Click Load unpacked
-4. Select the `extension/dist` folder
+2. Turn on Developer mode
+3. Click `Load unpacked`
+4. Select this folder:
 
-## Quick Start Order
+```txt
+/Users/driss/Desktop/ezz/easycrypto-driss_docs/code/extension/dist
+```
 
-If someone wants to run the full project locally, use this order:
-
-1. Install and start the backend
-2. Install and start the frontend
-3. Build the extension and load `extension/dist` in Chrome
-
-## Folder Commands Summary
+If you want rebuilds while developing the extension:
 
 ```bash
-cd backend && npm install
-cd frontend && npm install
-cd extension && npm install
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/extension
+npm run dev
 ```
+
+## 9. Quick Startup Order After First Install
+
+After you already installed everything once, use this order:
+
+1. Start PostgreSQL
+2. Start the backend
+3. Start the market API
+4. Start the frontend
+5. Build or watch the extension if you need it
+
+## 10. Quick Copy-Paste Commands
+
+### Terminal 1 - Backend
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/backend
+npm run dev
+```
+
+### Terminal 2 - Market API
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/server
+npm start
+```
+
+### Terminal 3 - Frontend
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/frontend
+npm run dev
+```
+
+### Terminal 4 - Extension Optional
+
+```bash
+cd /Users/driss/Desktop/ezz/easycrypto-driss_docs/code/extension
+npm run build
+```
+
+## 11. Quick Checks
+
+If something is not working, check these URLs:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5050/api/v1`
+- Market API: `http://localhost:3000/market`
+
+You can also test the market API directly:
+
+```bash
+curl http://localhost:3000/market
+```
+
+## 12. Common Problems
+
+### PostgreSQL connection error
+
+Your `DATABASE_URL` is wrong or PostgreSQL is not running.
+
+### Frontend cannot log in
+
+Make sure the backend is running on `5050`.
+
+### Prices are missing in the dashboard or swap page
+
+Make sure `server/` is running on `3000`.
+
+### Extension cannot talk to the backend
+
+Build the extension again after you change `backend/.env`, then reload the unpacked extension in Chrome.
